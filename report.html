@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Report</title>
+    <link rel="stylesheet" href="script.css">
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        .search-box,
+        .filter-box {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .percentage {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <h1>Attendance Management System</h1>
+
+    <div class="login-box">
+
+        <h2>Attendance Report</h2>
+
+        <input
+            type="text"
+            id="search"
+            class="search-box"
+            placeholder="Search Student Name..."
+            onkeyup="displayReport()"
+        >
+
+        <select id="filter" class="filter-box" onchange="displayReport()">
+            <option value="All">All Attendance</option>
+            <option value="Present">Present</option>
+            <option value="Absent">Absent</option>
+        </select>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Total Classes</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>Attendance %</th>
+                </tr>
+            </thead>
+
+            <tbody id="reportBody"></tbody>
+
+        </table>
+
+        <br>
+
+        <button onclick="window.location.href='dashboard.html'">
+            Back to Dashboard
+        </button>
+
+    </div>
+</div>
+
+<script>
+
+function displayReport() {
+
+    let attendance =
+        JSON.parse(localStorage.getItem("attendance")) || [];
+
+    let search =
+        document.getElementById("search").value.toLowerCase();
+
+    let filter =
+        document.getElementById("filter").value;
+
+    let reportBody =
+        document.getElementById("reportBody");
+
+    reportBody.innerHTML = "";
+
+    let students = {};
+
+    attendance.forEach(function(record) {
+
+        let name = record.studentName;
+
+        if (!students[name]) {
+            students[name] = {
+                total: 0,
+                present: 0,
+                absent: 0
+            };
+        }
+
+        if (filter === "All" || record.status === filter) {
+
+            students[name].total++;
+
+            if (record.status === "Present") {
+                students[name].present++;
+            }
+
+            if (record.status === "Absent") {
+                students[name].absent++;
+            }
+        }
+    });
+
+    let found = false;
+
+    for (let name in students) {
+
+        if (!name.toLowerCase().includes(search)) {
+            continue;
+        }
+
+        found = true;
+
+        let total = students[name].total;
+        let present = students[name].present;
+        let absent = students[name].absent;
+
+        let percentage = 0;
+
+        if (total > 0) {
+            percentage = Math.round((present / total) * 100);
+        }
+
+        let row = document.createElement("tr");
+
+        row.innerHTML =
+            "<td>" + name + "</td>" +
+            "<td>" + total + "</td>" +
+            "<td>" + present + "</td>" +
+            "<td>" + absent + "</td>" +
+            "<td class='percentage'>" +
+            percentage + "%" +
+            "</td>";
+
+        reportBody.appendChild(row);
+    }
+
+    if (!found) {
+
+        reportBody.innerHTML =
+            "<tr>" +
+            "<td colspan='5'>No Attendance Records Found</td>" +
+            "</tr>";
+    }
+}
+
+displayReport();
+
+</script>
+
+</body>
+</html>
