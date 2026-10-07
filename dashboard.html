@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Attendance Dashboard</title>
+
+    <link rel="stylesheet" href="script.css">
+
+    <style>
+        .dashboard-box {
+            background: white;
+            width: 90%;
+            max-width: 900px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .dashboard-box h2 {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            background: #f1f7ff;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .dashboard-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .dashboard-buttons button {
+            margin-top: 0;
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-box {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .cards,
+            .dashboard-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <h1>Attendance Management System</h1>
+
+    <div class="dashboard-box">
+
+        <h2>📊 Dashboard</h2>
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>Total Records</h3>
+                <p id="total">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Present</h3>
+                <p id="present">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Absent</h3>
+                <p id="absent">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Attendance %</h3>
+                <p id="percentage">0%</p>
+            </div>
+
+        </div>
+
+        <div class="dashboard-buttons">
+
+            <button onclick="window.location.href='student.html'">
+                👨‍🎓 Student Management
+            </button>
+
+            <button onclick="window.location.href='attendance.html'">
+                📝 Mark Attendance
+            </button>
+
+            <button onclick="window.location.href='report.html'">
+                📊 Attendance Report
+            </button>
+
+            <button onclick="window.location.href='qr.html'">
+                📱 QR Attendance
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let attendance =
+    JSON.parse(localStorage.getItem("attendance")) || [];
+
+let total = attendance.length;
+
+let present = attendance.filter(function(record) {
+    return record.status === "Present";
+}).length;
+
+let absent = attendance.filter(function(record) {
+    return record.status === "Absent";
+}).length;
+
+let percentage = 0;
+
+if (total > 0) {
+    percentage = Math.round((present / total) * 100);
+}
+
+document.getElementById("total").innerHTML = total;
+document.getElementById("present").innerHTML = present;
+document.getElementById("absent").innerHTML = absent;
+document.getElementById("percentage").innerHTML = percentage + "%";
+
+</script>
+
+</body>
+</html>
+
+        
