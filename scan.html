@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Scan QR Attendance</title>
+
+    <link rel="stylesheet" href="script.css">
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <h1>Attendance Management System</h1>
+
+        <div class="login-box">
+
+            <h2>Scan QR Code</h2>
+
+            <p>Allow camera permission and scan the QR Code.</p>
+
+            <br>
+
+            <div id="reader" style="width:300px; margin:auto;"></div>
+
+            <p id="message"></p>
+
+            <br>
+
+            <button onclick="startScanner()">
+                Start Camera
+            </button>
+
+            <br><br>
+
+            <button onclick="window.location.href='dashboard.html'">
+                Back to Dashboard
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <script>
+
+        let scanner;
+        let alreadyScanned = false;
+
+        function startScanner() {
+
+            alreadyScanned = false;
+
+            document.getElementById("message").innerHTML =
+                "Starting camera...";
+
+            document.getElementById("message").style.color = "black";
+
+            scanner = new Html5Qrcode("reader");
+
+            scanner.start(
+                { facingMode: "environment" },
+
+                {
+                    fps: 10,
+                    qrbox: 250
+                },
+
+                function(decodedText) {
+
+                    if (alreadyScanned) {
+                        return;
+                    }
+
+                    alreadyScanned = true;
+
+                    // Get existing attendance records
+                    let attendance =
+                        JSON.parse(localStorage.getItem("attendance")) || [];
+
+                    // Student name
+                    let studentName =
+                        prompt("Enter Student Name:");
+
+                    if (!studentName) {
+                        alreadyScanned = false;
+                        return;
+                    }
+
+                    // Automatic Date and Time
+                    let now = new Date();
+
+                    let date =
+                        now.toLocaleDateString();
+
+                    let time =
+                        now.toLocaleTimeString();
+
+                    // Duplicate attendance check
+                    let duplicate = attendance.some(function(record) {
+
+                        return record.studentName.toLowerCase() ===
+                            studentName.toLowerCase()
+                            &&
+                            record.date === date;
+
+                    });
+
+                    if (duplicate) {
+
+                        document.getElementById("message").innerHTML =
+                            "⚠️ Attendance already marked today!";
+
+                        document.getElementById("message").style.color =
+                            "red";
+
+                        alert("Attendance already marked today!");
+
+                        scanner.stop();
+
+                        return;
+                    }
+
+                    // Add new attendance
+                    attendance.push({
+
+                        studentName: studentName,
+
+                        date: date,
+
+                        time: time,
+
+                        status: "Present"
+
+                    });
+
+                    // Save attendance
+                    localStorage.setItem(
+                        "attendance",
+                        JSON.stringify(attendance)
+                    );
+
+                    document.getElementById("message").innerHTML =
+                        "✅ Attendance Marked Successfully!<br>" +
+                        "Date: " + date + "<br>" +
+                        "Time: " + time;
+
+                    document.getElementById("message").style.color =
+                        "green";
+
+                    alert("Attendance Marked Successfully!");
+
+                    scanner.stop();
+
+                },
+
+                function(errorMessage) {
+                    // QR not detected
+                }
+
+            ).catch(function(error) {
+
+                document.getElementById("message").innerHTML =
+                    "❌ Camera could not start.";
+
+                document.getElementById("message").style.color =
+                    "red";
+
+                console.log(error);
+
+            });
+
+        }
+
+    </script>
+
+</body>
+
+</html>
