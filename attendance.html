@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mark Attendance</title>
+
+    <link rel="stylesheet" href="script.css">
+
+    <style>
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <h1>Attendance Management System</h1>
+
+        <div class="login-box">
+
+            <h2>Mark Attendance</h2>
+
+            <select id="studentSelect">
+
+                <option value="">
+                    Select Student
+                </option>
+
+            </select>
+
+            <input
+                type="date"
+                id="attendanceDate"
+            >
+
+            <select id="status">
+
+                <option value="Present">
+                    Present
+                </option>
+
+                <option value="Absent">
+                    Absent
+                </option>
+
+            </select>
+
+            <button onclick="markAttendance()">
+                Mark Attendance
+            </button>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="attendanceBody">
+
+                </tbody>
+
+            </table>
+
+            <br>
+
+            <button onclick="window.location.href='dashboard.html'">
+                Back to Dashboard
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        let students =
+            JSON.parse(localStorage.getItem("students")) || [];
+
+
+        let attendance =
+            JSON.parse(localStorage.getItem("attendance")) || [];
+
+
+        let studentSelect =
+            document.getElementById("studentSelect");
+
+
+        students.forEach(function(student) {
+
+            let option =
+                document.createElement("option");
+
+            option.value = student.name;
+
+            option.textContent =
+                student.name +
+                " - " +
+                student.rollNumber;
+
+            studentSelect.appendChild(option);
+
+        });
+
+
+        // Today's date
+
+        let today =
+            new Date().toISOString().split("T")[0];
+
+        document.getElementById("attendanceDate").value =
+            today;
+
+
+        function markAttendance() {
+
+            let studentName =
+                document.getElementById("studentSelect").value;
+
+            let date =
+                document.getElementById("attendanceDate").value;
+
+            let status =
+                document.getElementById("status").value;
+
+
+            if (studentName === "" || date === "") {
+
+                alert("Please select student and date.");
+
+                return;
+
+            }
+
+
+            // Duplicate check
+
+            let duplicate =
+                attendance.some(function(record) {
+
+                    return record.studentName === studentName &&
+                           record.date === date;
+
+                });
+
+
+            if (duplicate) {
+
+                alert(
+                    "Attendance already marked for this student on this date!"
+                );
+
+                return;
+
+            }
+
+
+            attendance.push({
+
+                studentName: studentName,
+
+                date: date,
+
+                time: new Date().toLocaleTimeString(),
+
+                status: status
+
+            });
+
+
+            localStorage.setItem(
+                "attendance",
+                JSON.stringify(attendance)
+            );
+
+
+            alert("Attendance marked successfully!");
+
+
+            displayAttendance();
+
+        }
+
+
+        function displayAttendance() {
+
+            let body =
+                document.getElementById("attendanceBody");
+
+            body.innerHTML = "";
+
+
+            attendance.forEach(function(record) {
+
+                let row =
+                    document.createElement("tr");
+
+
+                row.innerHTML =
+
+                    "<td>" +
+                    record.studentName +
+                    "</td>" +
+
+                    "<td>" +
+                    record.date +
+                    "</td>" +
+
+                    "<td>" +
+                    record.status +
+                    "</td>";
+
+
+                body.appendChild(row);
+
+            });
+
+        }
+
+
+        displayAttendance();
+
+    </script>
+
+</body>
+
+</html>
