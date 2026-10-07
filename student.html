@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Management</title>
+
+    <link rel="stylesheet" href="script.css">
+
+    <style>
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        .student-input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <h1>Attendance Management System</h1>
+
+        <div class="login-box">
+
+            <h2>Student Management</h2>
+
+            <input
+                type="text"
+                id="studentName"
+                class="student-input"
+                placeholder="Enter Student Name"
+            >
+
+            <input
+                type="text"
+                id="rollNumber"
+                class="student-input"
+                placeholder="Enter Roll Number"
+            >
+
+            <input
+                type="text"
+                id="department"
+                class="student-input"
+                placeholder="Enter Department"
+            >
+
+            <button onclick="addStudent()">
+                Add Student
+            </button>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Roll Number</th>
+                        <th>Department</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="studentBody">
+
+                </tbody>
+
+            </table>
+
+            <br>
+
+            <button onclick="window.location.href='dashboard.html'">
+                Back to Dashboard
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        let students =
+            JSON.parse(localStorage.getItem("students")) || [];
+
+
+        function addStudent() {
+
+            let name =
+                document.getElementById("studentName").value.trim();
+
+            let roll =
+                document.getElementById("rollNumber").value.trim();
+
+            let department =
+                document.getElementById("department").value.trim();
+
+
+            if (name === "" || roll === "" || department === "") {
+
+                alert("Please enter all student details.");
+
+                return;
+            }
+
+
+            let student = {
+
+                name: name,
+
+                rollNumber: roll,
+
+                department: department
+
+            };
+
+
+            students.push(student);
+
+
+            localStorage.setItem(
+                "students",
+                JSON.stringify(students)
+            );
+
+
+            document.getElementById("studentName").value = "";
+
+            document.getElementById("rollNumber").value = "";
+
+            document.getElementById("department").value = "";
+
+
+            displayStudents();
+
+        }
+
+
+        function displayStudents() {
+
+            let studentBody =
+                document.getElementById("studentBody");
+
+            studentBody.innerHTML = "";
+
+
+            students.forEach(function(student) {
+
+                let row =
+                    document.createElement("tr");
+
+
+                row.innerHTML =
+
+                    "<td>" +
+                    student.name +
+                    "</td>" +
+
+                    "<td>" +
+                    student.rollNumber +
+                    "</td>" +
+
+                    "<td>" +
+                    student.department +
+                    "</td>";
+
+
+                studentBody.appendChild(row);
+
+            });
+
+        }
+
+
+        displayStudents();
+
+    </script>
+
+</body>
+
+</html>
